@@ -1,0 +1,1 @@
+This folder contains Word Games Java Client.

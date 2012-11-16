@@ -1,0 +1,9 @@
+1. update changes.txt
+2. update repo
+3. run unit tests: mvn test -Dtest=???Suite
+4. release signed to repo
+
+mvn clean
+mvn release:clean
+mvn release:prepare -Prelease
+mvn release:perform -Prelease

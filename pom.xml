@@ -5,7 +5,7 @@
     <groupId>org.entitypedia.games</groupId>
     <artifactId>entitypedia-games-client</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.0</version>
 
     <name>Word Games Client</name>
     <description>Word Games Java Client</description>
@@ -33,9 +33,9 @@
         </developer>
     </developers>
     <scm>
-        <connection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/trunk</connection>
-        <developerConnection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/trunk</developerConnection>
-        <url>https://dev.entitypedia.org/svn/</url>
+        <connection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/tags/entitypedia-games-client-1.0.0</connection>
+        <developerConnection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/tags/entitypedia-games-client-1.0.0</developerConnection>
+        <url>https://dev.entitypedia.org/svn/tags/entitypedia-games-client-1.0.0</url>
     </scm>
 
     <mailingLists>

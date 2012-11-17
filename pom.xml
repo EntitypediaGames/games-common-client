@@ -70,7 +70,7 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>entitypedia-games-common-model</artifactId>
-            <version>1.0.1-SNAPSHOT</version>
+            <version>1.0.1</version>
         </dependency>
 
         <!-- jackson JSON dependencies -->

@@ -38,7 +38,7 @@ public abstract class WordGameClient {
 
     protected String apiEndpoint = "http://localhost:9080/<game>/webapi/";
 
-    protected OAuthConsumer consumer;
+    protected final OAuthConsumer consumer;
     protected final ObjectMapper mapper = new ObjectMapper();
 
     public WordGameClient(String apiEndpoint, String uid, String password) {

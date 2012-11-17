@@ -8,8 +8,8 @@ import oauth.signpost.basic.DefaultOAuthConsumer;
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
-import org.entitypedia.games.common.model.ResultsPage;
 import org.entitypedia.games.common.exceptions.ExceptionDetails;
+import org.entitypedia.games.common.exceptions.WordGameException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,16 +19,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.Date;
-import java.util.List;
 
 /**
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public abstract class WordGamesClient {
+public abstract class WordGameClient {
 
-    private static final Logger log = LoggerFactory.getLogger(WordGamesClient.class);
+    private static final Logger log = LoggerFactory.getLogger(WordGameClient.class);
 
     protected final static String CHARSET = "UTF-8";
     protected static final TypeReference<Long> LONG_TYPE_REFERENCE = new TypeReference<Long>() {
@@ -38,12 +36,13 @@ public abstract class WordGamesClient {
     protected static final TypeReference<Boolean> BOOLEAN_TYPE_REFERENCE = new TypeReference<Boolean>() {
     };
 
-    protected String apiEndpoint = "http://localhost:9080/crosswords/webapi/";
+    protected String apiEndpoint = "http://localhost:9080/<game>/webapi/";
 
     protected OAuthConsumer consumer;
     protected final ObjectMapper mapper = new ObjectMapper();
 
-    public WordGamesClient(String uid, String password) {
+    public WordGameClient(String apiEndpoint, String uid, String password) {
+        this.apiEndpoint = apiEndpoint;
         consumer = new DefaultOAuthConsumer(uid, password);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
@@ -70,7 +69,7 @@ public abstract class WordGamesClient {
         return listUrl.toString();
     }
 
-    private <T> T doSimpleGet(String url, TypeReference<T> type) throws CrosswordException {
+    protected <T> T doSimpleGet(String url, TypeReference<T> type) throws WordGameException {
         log.debug("GETting url: " + url);
         try {
             URL u = new URL(url);
@@ -112,19 +111,19 @@ public abstract class WordGamesClient {
                 connection.disconnect();
             }
         } catch (MalformedURLException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthExpectationFailedException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthCommunicationException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthMessageSignerException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         }
     }
 
-    private void doSimplePost(String url) throws CrosswordException {
+    protected void doSimplePost(String url) throws WordGameException {
         log.debug("POSTing url: " + url);
         try {
             URL u = new URL(url);
@@ -144,19 +143,19 @@ public abstract class WordGamesClient {
                 connection.disconnect();
             }
         } catch (MalformedURLException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthExpectationFailedException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthCommunicationException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthMessageSignerException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         }
     }
 
-    private void doPostObject(String url, Object object) throws CrosswordException {
+    protected void doPostObject(String url, Object object) throws WordGameException {
         log.debug("POSTing object: " + url);
         try {
             URL u = new URL(url);
@@ -189,19 +188,19 @@ public abstract class WordGamesClient {
                 connection.disconnect();
             }
         } catch (MalformedURLException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthExpectationFailedException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthCommunicationException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthMessageSignerException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         }
     }
 
-    private <T> T doPostReadObject(String url, Object object, TypeReference<T> type) throws CrosswordException {
+    protected <T> T doPostReadObject(String url, Object object, TypeReference<T> type) throws WordGameException {
         log.debug("POSTing object: " + url);
         try {
             URL u = new URL(url);
@@ -257,19 +256,19 @@ public abstract class WordGamesClient {
                 connection.disconnect();
             }
         } catch (MalformedURLException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthExpectationFailedException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthCommunicationException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthMessageSignerException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         }
     }
 
-    private <T> T doPostRead(String url, TypeReference<T> type) throws CrosswordException {
+    protected <T> T doPostRead(String url, TypeReference<T> type) throws WordGameException {
         log.debug("POSTing url: " + url);
         try {
             URL u = new URL(url);
@@ -312,20 +311,20 @@ public abstract class WordGamesClient {
                 connection.disconnect();
             }
         } catch (MalformedURLException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthExpectationFailedException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthCommunicationException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (OAuthMessageSignerException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         } catch (IOException e) {
-            throw new CrosswordException(e.getMessage(), e);
+            throw new WordGameException(e.getMessage(), e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private RuntimeException processError(HttpURLConnection connection) throws IOException {
+    protected RuntimeException processError(HttpURLConnection connection) throws IOException {
         log.debug("Processing error...");
         InputStream err = null;
         try {
@@ -347,16 +346,16 @@ public abstract class WordGamesClient {
 
             ExceptionDetails details = mapper.readValue(err, ExceptionDetails.class);
             if (null != details) {
-                Class clazz = CrosswordException.class;
+                Class clazz = WordGameException.class;
                 try {
                     clazz = Class.forName(details.getExceptionClass());
                 } catch (ClassNotFoundException e) {
                     log.debug("Exception class not found: " + details.getExceptionClass());
                 }
 
-                if (CrosswordException.class.isAssignableFrom(clazz)) {
-                    Constructor<? extends CrosswordException> paramConstructor = null;
-                    Constructor<? extends CrosswordException> stringConstructor = null;
+                if (WordGameException.class.isAssignableFrom(clazz)) {
+                    Constructor<? extends WordGameException> paramConstructor = null;
+                    Constructor<? extends WordGameException> stringConstructor = null;
                     try {
                         paramConstructor = clazz.getConstructor(Object[].class);
                     } catch (NoSuchMethodException e) {
@@ -370,7 +369,7 @@ public abstract class WordGamesClient {
                         }
                     }
 
-                    CrosswordException ce = null;
+                    WordGameException ce = null;
                     try {
                         if (null != paramConstructor) {
                             Object arg = details.getParams();
@@ -379,11 +378,11 @@ public abstract class WordGamesClient {
                             ce = stringConstructor.newInstance(details.getErrorMessage());
                         }
                     } catch (InstantiationException e) {
-                        throw new CrosswordException(e.getMessage(), e);
+                        throw new WordGameException(e.getMessage(), e);
                     } catch (IllegalAccessException e) {
-                        throw new CrosswordException(e.getMessage(), e);
+                        throw new WordGameException(e.getMessage(), e);
                     } catch (InvocationTargetException e) {
-                        throw new CrosswordException(e.getMessage(), e);
+                        throw new WordGameException(e.getMessage(), e);
                     }
                     return ce;
                 } else if (Throwable.class.isAssignableFrom(clazz)) {
@@ -391,30 +390,30 @@ public abstract class WordGamesClient {
                     try {
                         stringConstructor = clazz.getConstructor(String.class);
                     } catch (NoSuchMethodException e) {
-                        return new CrosswordException("Cannot find String constructor for exception: " + clazz.getName(), e);
+                        return new WordGameException("Cannot find String constructor for exception: " + clazz.getName(), e);
                     }
 
                     Throwable t = null;
                     try {
                         t = stringConstructor.newInstance(details.getErrorMessage());
                     } catch (InstantiationException e) {
-                        throw new CrosswordException(e.getMessage(), e);
+                        throw new WordGameException(e.getMessage(), e);
                     } catch (IllegalAccessException e) {
-                        throw new CrosswordException(e.getMessage(), e);
+                        throw new WordGameException(e.getMessage(), e);
                     } catch (InvocationTargetException e) {
-                        throw new CrosswordException(e.getMessage(), e);
+                        throw new WordGameException(e.getMessage(), e);
                     }
 
                     if (RuntimeException.class.isAssignableFrom(clazz)) {
                         return (RuntimeException) t;
                     } else {
-                        return new CrosswordException(details.getErrorMessage(), t);
+                        return new WordGameException(details.getErrorMessage(), t);
                     }
                 } else {
-                    return new CrosswordException(details.getExceptionClass() + " is not assignable from Throwable");
+                    return new WordGameException(details.getExceptionClass() + " is not assignable from Throwable");
                 }
             } else {
-                return new CrosswordException("Unable to parse error details");
+                return new WordGameException("Unable to parse error details");
             }
         } finally {
             if (null != err) {

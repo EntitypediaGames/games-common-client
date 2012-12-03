@@ -2,6 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>org.entitypedia.games</groupId>
+        <artifactId>entitypedia-games-parent</artifactId>
+        <version>3</version>
+    </parent>
+
     <groupId>org.entitypedia.games</groupId>
     <artifactId>entitypedia-games-client</artifactId>
     <packaging>jar</packaging>
@@ -11,85 +17,11 @@
     <description>Word Games Java Client</description>
     <url>http://games.entitypedia.org/crosswords/</url>
 
-    <properties>
-        <jackson.version>2.1.0</jackson.version>
-        <junit.version>4.10</junit.version>
-        <slf4j.version>1.7.2</slf4j.version>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.build.source>1.6</project.build.source>
-        <project.build.target>1.6</project.build.target>
-    </properties>
-
-    <developers>
-        <developer>
-            <id>autayeu</id>
-            <name>Aliaksandr Autayeu</name>
-            <email>autayeu@disi.unitn.it</email>
-            <url>http://autayeu.com</url>
-            <timezone>+1</timezone>
-            <properties>
-                <picUrl>http://autayeu.com/img/photos/aliaksandr-autayeu.jpg</picUrl>
-            </properties>
-        </developer>
-    </developers>
     <scm>
         <connection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/trunk</connection>
         <developerConnection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/trunk</developerConnection>
-        <url>https://dev.entitypedia.org/svn/</url>
+        <url>https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/</url>
     </scm>
-
-    <mailingLists>
-        <mailingList>
-            <name>entitypedia-news</name>
-            <subscribe>http://disi.unitn.it/mailman/listinfo/entitypedia-news</subscribe>
-            <unsubscribe>http://disi.unitn.it/mailman/listinfo/entitypedia-news</unsubscribe>
-            <archive>http://disi.unitn.it/mailman/listinfo/entitypedia-news</archive>
-        </mailingList>
-    </mailingLists>
-
-    <issueManagement>
-        <system>Trac</system>
-        <url>https://dev.entitypedia.org/trac/entitypedia/</url>
-    </issueManagement>
-
-    <distributionManagement>
-        <repository>
-            <id>entitypedia</id>
-            <name>Entitypedia Maven2 Repository</name>
-            <url>https://dev.entitypedia.org/archiva/repository/internal/</url>
-        </repository>
-        <snapshotRepository>
-            <id>entitypedia-snapshots</id>
-            <name>Entitypedia Maven2 Snapshots Repository</name>
-            <url>https://dev.entitypedia.org/archiva/repository/snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
-
-    <repositories>
-        <repository>
-            <id>entitypedia</id>
-            <layout>default</layout>
-            <name>Entitypedia Maven Repository</name>
-            <url>https://dev.entitypedia.org/archiva/repository/internal</url>
-            <releases>
-                <enabled>true</enabled>
-                <updatePolicy>never</updatePolicy>
-            </releases>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-            <id>spring-milestone</id>
-            <name>Spring Framework Milestone Repository</name>
-            <url>http://maven.springframework.org/milestone</url>
-        </repository>
-        <repository>
-            <id>spring-release</id>
-            <name>Spring Framework Release Repository</name>
-            <url>http://maven.springframework.org/release</url>
-        </repository>
-    </repositories>
 
     <dependencies>
         <dependency>
@@ -146,55 +78,15 @@
 
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
-                <configuration>
-                    <source>${project.build.source}</source>
-                    <target>${project.build.target}</target>
-                </configuration>
-            </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
-            </plugin>
-        </plugins>
-    </build>
-
     <profiles>
         <profile>
-            <id>sonatype-oss-release</id>
-            <properties>
-                <maven.test.skip>true</maven.test.skip>
-            </properties>
-        </profile>
-
-        <profile>
             <id>release</id>
-
-            <properties>
-                <maven.test.skip>true</maven.test.skip>
-            </properties>
-
-            <activation>
-                <property>
-                    <name>performRelease</name>
-                    <value>true</value>
-                </property>
-            </activation>
 
             <build>
                 <plugins>
                     <plugin>
-                        <inherited>true</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.2.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -205,38 +97,13 @@
                         </executions>
                     </plugin>
                     <plugin>
-                        <inherited>true</inherited>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>2.9</version>
                         <executions>
                             <execution>
                                 <id>attach-javadocs</id>
                                 <goals>
                                     <goal>jar</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
-                    <plugin>
-                        <inherited>true</inherited>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-deploy-plugin</artifactId>
-                        <version>2.7</version>
-                        <configuration>
-                            <updateReleaseInfo>true</updateReleaseInfo>
-                        </configuration>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.4</version>
-                        <executions>
-                            <execution>
-                                <id>sign-artifacts</id>
-                                <phase>verify</phase>
-                                <goals>
-                                    <goal>sign</goal>
                                 </goals>
                             </execution>
                         </executions>

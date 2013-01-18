@@ -19,6 +19,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Date;
 
 /**
@@ -53,6 +54,14 @@ public abstract class WordGameClient {
 
     public void setApiEndpoint(String apiEndpoint) {
         this.apiEndpoint = apiEndpoint;
+    }
+
+    protected String encodeURL(String string) {
+        try {
+            return URLEncoder.encode(string, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new WordGameException("UnsupportedEncodingException: " + e.getMessage(), e);
+        }
     }
 
     protected String addPageSizeAndNo(String url, Integer pageSize, Integer pageNo) {

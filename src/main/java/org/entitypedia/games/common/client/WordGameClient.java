@@ -42,6 +42,8 @@ public abstract class WordGameClient {
     protected final OAuthConsumer consumer;
     protected final ObjectMapper mapper = new ObjectMapper();
 
+    protected boolean signConnection = true;
+
     public WordGameClient(String apiEndpoint, String uid, String password) {
         this.apiEndpoint = apiEndpoint;
         consumer = new DefaultOAuthConsumer(uid, password);
@@ -54,6 +56,14 @@ public abstract class WordGameClient {
 
     public void setApiEndpoint(String apiEndpoint) {
         this.apiEndpoint = apiEndpoint;
+    }
+
+    public boolean isSignConnection() {
+        return signConnection;
+    }
+
+    public void setSignConnection(boolean signConnection) {
+        this.signConnection = signConnection;
     }
 
     protected String encodeURL(String string) {
@@ -78,6 +88,40 @@ public abstract class WordGameClient {
         return listUrl.toString();
     }
 
+    protected void doEmptyGet(String url) throws WordGameException {
+        log.debug("GETting url: " + url);
+        try {
+            URL u = new URL(url);
+            HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+            try {
+                connection.setRequestProperty("Accept-Charset", CHARSET);
+                if (signConnection) {
+                    consumer.sign(connection);
+                }
+                connection.connect();
+
+                log.debug("Response code: " + connection.getResponseCode());
+                if (200 == connection.getResponseCode()) {
+                } else {
+                    throw processError(connection);
+                }
+            } finally {
+                connection.disconnect();
+            }
+        } catch (MalformedURLException e) {
+            throw new WordGameException(e.getMessage(), e);
+        } catch (OAuthExpectationFailedException e) {
+            throw new WordGameException(e.getMessage(), e);
+        } catch (OAuthCommunicationException e) {
+            throw new WordGameException(e.getMessage(), e);
+        } catch (OAuthMessageSignerException e) {
+            throw new WordGameException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new WordGameException(e.getMessage(), e);
+        }
+    }
+
+
     protected <T> T doSimpleGet(String url, TypeReference<T> type) throws WordGameException {
         log.debug("GETting url: " + url);
         try {
@@ -85,7 +129,9 @@ public abstract class WordGameClient {
             HttpURLConnection connection = (HttpURLConnection) u.openConnection();
             try {
                 connection.setRequestProperty("Accept-Charset", CHARSET);
-                consumer.sign(connection);
+                if (signConnection) {
+                    consumer.sign(connection);
+                }
                 connection.connect();
 
                 log.debug("Response code: " + connection.getResponseCode());
@@ -140,7 +186,9 @@ public abstract class WordGameClient {
             try {
                 connection.setRequestProperty("Accept-Charset", CHARSET);
                 connection.setRequestMethod("POST");
-                consumer.sign(connection);
+                if (signConnection) {
+                    consumer.sign(connection);
+                }
                 connection.connect();
 
                 log.debug("Response code: " + connection.getResponseCode());
@@ -175,7 +223,9 @@ public abstract class WordGameClient {
                 connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
                 connection.setChunkedStreamingMode(0);
-                consumer.sign(connection);
+                if (signConnection) {
+                    consumer.sign(connection);
+                }
                 connection.connect();
 
                 OutputStream out = null;
@@ -220,7 +270,9 @@ public abstract class WordGameClient {
                 connection.setRequestMethod("POST");
                 connection.setDoOutput(true);
                 connection.setChunkedStreamingMode(0);
-                consumer.sign(connection);
+                if (signConnection) {
+                    consumer.sign(connection);
+                }
                 connection.connect();
 
                 OutputStream out = null;
@@ -285,7 +337,9 @@ public abstract class WordGameClient {
             try {
                 connection.setRequestProperty("Accept-Charset", CHARSET);
                 connection.setRequestMethod("POST");
-                consumer.sign(connection);
+                if (signConnection) {
+                    consumer.sign(connection);
+                }
                 connection.connect();
 
                 log.debug("Response code: " + connection.getResponseCode());

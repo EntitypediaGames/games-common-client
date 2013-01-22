@@ -1,0 +1,1 @@
+- move api urls to properties, differentiate release and intergration test builds

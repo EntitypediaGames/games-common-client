@@ -25,7 +25,7 @@ import java.util.Date;
 /**
  * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public abstract class WordGameClient {
+public abstract class WordGameClient implements IWordGameClient {
 
     private static final Logger log = LoggerFactory.getLogger(WordGameClient.class);
 
@@ -50,18 +50,22 @@ public abstract class WordGameClient {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
+    @Override
     public String getApiEndpoint() {
         return apiEndpoint;
     }
 
+    @Override
     public void setApiEndpoint(String apiEndpoint) {
         this.apiEndpoint = apiEndpoint;
     }
 
-    public boolean isSignConnection() {
+    @Override
+    public boolean getSignConnection() {
         return signConnection;
     }
 
+    @Override
     public void setSignConnection(boolean signConnection) {
         this.signConnection = signConnection;
     }

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.entitypedia.games</groupId>
         <artifactId>entitypedia-games-parent</artifactId>
-        <version>3</version>
+        <version>5</version>
     </parent>
 
     <groupId>org.entitypedia.games</groupId>
@@ -13,8 +13,8 @@
     <packaging>jar</packaging>
     <version>1.0.2-SNAPSHOT</version>
 
-    <name>Word Games Client</name>
-    <description>Word Games Java Client</description>
+    <name>Entitypedia Games Client</name>
+    <description>Entitypedia Games Java Client</description>
     <url>http://games.entitypedia.org/crosswords/</url>
 
     <scm>
@@ -23,11 +23,40 @@
         <url>https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/</url>
     </scm>
 
+    <repositories>
+        <repository>
+            <id>entitypedia</id>
+            <layout>default</layout>
+            <name>Entitypedia Maven Repository</name>
+            <url>https://dev.entitypedia.org/archiva/repository/internal/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>entitypedia-snapshots</id>
+            <layout>default</layout>
+            <name>Entitypedia Maven Snapshot Repository</name>
+            <url>https://dev.entitypedia.org/archiva/repository/snapshots/</url>
+            <releases>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>entitypedia-games-common-model</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.3-SNAPSHOT</version>
         </dependency>
 
         <!-- jackson JSON dependencies -->
@@ -52,7 +81,7 @@
         <dependency>
             <groupId>oauth.signpost</groupId>
             <artifactId>signpost-core</artifactId>
-            <version>1.2.1.2</version>
+            <version>${signpost.version}</version>
         </dependency>
 
         <dependency>

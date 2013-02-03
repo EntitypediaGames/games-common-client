@@ -36,6 +36,8 @@ public abstract class WordGameClient implements IWordGameClient {
     };
     protected static final TypeReference<Boolean> BOOLEAN_TYPE_REFERENCE = new TypeReference<Boolean>() {
     };
+    protected static final TypeReference<Double> DOUBLE_TYPE_REFERENCE = new TypeReference<Double>() {
+    };
 
     protected String apiEndpoint = "http://localhost:9080/<game>/webapi/";
 

@@ -11,16 +11,16 @@
     <groupId>org.entitypedia.games</groupId>
     <artifactId>entitypedia-games-client</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
 
     <name>Entitypedia Games Client</name>
     <description>Entitypedia Games Java Client</description>
     <url>http://games.entitypedia.org/crosswords/</url>
 
     <scm>
-        <connection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/trunk</connection>
-        <developerConnection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/trunk</developerConnection>
-        <url>https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/</url>
+        <connection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/tags/entitypedia-games-client-1.0.3</connection>
+        <developerConnection>scm:svn:https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/tags/entitypedia-games-client-1.0.3</developerConnection>
+        <url>https://dev.entitypedia.org/svn/entitypedia/apps/word-games-client/tags/entitypedia-games-client-1.0.3</url>
     </scm>
 
     <repositories>

@@ -73,23 +73,63 @@ public abstract class WordGameClient implements IWordGameClient {
     }
 
     protected String encodeURL(String string) {
-        try {
-            return URLEncoder.encode(string, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new WordGameException("UnsupportedEncodingException: " + e.getMessage(), e);
+        if (null == string) {
+            return null;
+        } else {
+            try {
+                return URLEncoder.encode(string, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                throw new WordGameException("UnsupportedEncodingException: " + e.getMessage(), e);
+            }
         }
     }
 
     protected String addPageSizeAndNo(String url, Integer pageSize, Integer pageNo) {
         StringBuilder listUrl = new StringBuilder(url);
         if (null != pageSize) {
-            listUrl.append("pageSize=").append(Integer.toString(pageSize));
-            if (null != pageNo) {
-                listUrl.append("&");
+            if (-1 == listUrl.indexOf("?")) {
+                listUrl.append('?');
+            } else {
+                listUrl.append('&');
             }
+            listUrl.append("pageSize=").append(Integer.toString(pageSize));
         }
         if (null != pageNo) {
+            if (-1 == listUrl.indexOf("?")) {
+                listUrl.append('?');
+            } else {
+                listUrl.append('&');
+            }
             listUrl.append("pageNo=").append(Integer.toString(pageNo));
+        }
+        return listUrl.toString();
+    }
+
+    protected String addPageSizeAndNoAndFilter(String url, Integer pageSize, Integer pageNo, String filter) {
+        StringBuilder listUrl = new StringBuilder(url);
+        if (null != pageSize) {
+            if (-1 == listUrl.indexOf("?")) {
+                listUrl.append('?');
+            } else {
+                listUrl.append('&');
+            }
+            listUrl.append("pageSize=").append(Integer.toString(pageSize));
+        }
+        if (null != pageNo) {
+            if (-1 == listUrl.indexOf("?")) {
+                listUrl.append('?');
+            } else {
+                listUrl.append('&');
+            }
+            listUrl.append("pageNo=").append(Integer.toString(pageNo));
+        }
+        if (null != filter) {
+            if (-1 == listUrl.indexOf("?")) {
+                listUrl.append('?');
+            } else {
+                listUrl.append('&');
+            }
+            listUrl.append("filter=").append(filter);
         }
         return listUrl.toString();
     }

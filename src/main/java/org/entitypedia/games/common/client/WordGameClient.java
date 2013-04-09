@@ -134,6 +134,43 @@ public abstract class WordGameClient implements IWordGameClient {
         return listUrl.toString();
     }
 
+    protected String addPageSizeAndNoAndFilterAndOrder(String url, Integer pageSize, Integer pageNo, String filter, String order) {
+        StringBuilder listUrl = new StringBuilder(url);
+        if (null != pageSize) {
+            if (-1 == listUrl.indexOf("?")) {
+                listUrl.append('?');
+            } else {
+                listUrl.append('&');
+            }
+            listUrl.append("pageSize=").append(Integer.toString(pageSize));
+        }
+        if (null != pageNo) {
+            if (-1 == listUrl.indexOf("?")) {
+                listUrl.append('?');
+            } else {
+                listUrl.append('&');
+            }
+            listUrl.append("pageNo=").append(Integer.toString(pageNo));
+        }
+        if (null != filter) {
+            if (-1 == listUrl.indexOf("?")) {
+                listUrl.append('?');
+            } else {
+                listUrl.append('&');
+            }
+            listUrl.append("filter=").append(filter);
+        }
+        if (null != order) {
+            if (-1 == listUrl.indexOf("?")) {
+                listUrl.append('?');
+            } else {
+                listUrl.append('&');
+            }
+            listUrl.append("order=").append(order);
+        }
+        return listUrl.toString();
+    }
+
     protected void doEmptyGet(String url) throws WordGameException {
         log.debug("GETting url: " + url);
         try {

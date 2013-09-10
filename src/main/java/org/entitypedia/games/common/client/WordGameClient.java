@@ -52,6 +52,13 @@ public abstract class WordGameClient implements IWordGameClient {
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 
+    public WordGameClient(String apiEndpoint, String uid, String password, String token, String tokenSecret) {
+        this.apiEndpoint = apiEndpoint;
+        consumer = new DefaultOAuthConsumer(uid, password);
+        consumer.setTokenWithSecret(token, tokenSecret);
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+    }
+
     @Override
     public String getApiEndpoint() {
         return apiEndpoint;

@@ -476,15 +476,19 @@ public abstract class WordGameClient implements IWordGameClient {
         }
     }
 
-    @SuppressWarnings("unchecked")
     protected RuntimeException processError(HttpURLConnection connection) throws IOException {
+        return processError(connection.getErrorStream(), mapper);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static RuntimeException processError(InputStream errorStream, ObjectMapper mapper) throws IOException {
         log.debug("Processing error...");
         InputStream err = null;
         try {
             if (log.isDebugEnabled()) {
                 final int BUFFER_SIZE = 1024 * 1024; // 1M buffer
                 ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
-                err = new BufferedInputStream(connection.getErrorStream());
+                err = new BufferedInputStream(errorStream);
                 int b;
                 while ((b = err.read()) != -1) {
                     bos.write(b);
@@ -494,7 +498,7 @@ public abstract class WordGameClient implements IWordGameClient {
                 log.debug("Response:\n" + response + "\n");
                 err = new ByteArrayInputStream(buffer);
             } else {
-                err = new BufferedInputStream(connection.getErrorStream());
+                err = new BufferedInputStream(errorStream);
             }
 
             ExceptionDetails details = mapper.readValue(err, ExceptionDetails.class);

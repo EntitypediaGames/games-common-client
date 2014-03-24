@@ -17,7 +17,6 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
@@ -197,15 +196,7 @@ public abstract class WordGameClient implements IWordGameClient {
             } finally {
                 connection.disconnect();
             }
-        } catch (MalformedURLException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthExpectationFailedException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthCommunicationException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthMessageSignerException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
         }
     }
@@ -254,15 +245,7 @@ public abstract class WordGameClient implements IWordGameClient {
             } finally {
                 connection.disconnect();
             }
-        } catch (MalformedURLException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthExpectationFailedException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthCommunicationException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthMessageSignerException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
         }
     }
@@ -287,15 +270,7 @@ public abstract class WordGameClient implements IWordGameClient {
             } finally {
                 connection.disconnect();
             }
-        } catch (MalformedURLException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthExpectationFailedException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthCommunicationException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthMessageSignerException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
         }
     }
@@ -333,15 +308,7 @@ public abstract class WordGameClient implements IWordGameClient {
             } finally {
                 connection.disconnect();
             }
-        } catch (MalformedURLException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthExpectationFailedException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthCommunicationException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthMessageSignerException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
         }
     }
@@ -403,15 +370,7 @@ public abstract class WordGameClient implements IWordGameClient {
             } finally {
                 connection.disconnect();
             }
-        } catch (MalformedURLException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthExpectationFailedException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthCommunicationException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthMessageSignerException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
         }
     }
@@ -460,15 +419,7 @@ public abstract class WordGameClient implements IWordGameClient {
             } finally {
                 connection.disconnect();
             }
-        } catch (MalformedURLException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthExpectationFailedException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthCommunicationException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (OAuthMessageSignerException e) {
-            throw new WordGameException(e.getMessage(), e);
-        } catch (IOException e) {
+        } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
         }
     }
@@ -531,11 +482,7 @@ public abstract class WordGameClient implements IWordGameClient {
                         } else if (null != stringConstructor) {
                             ce = stringConstructor.newInstance(details.getErrorMessage());
                         }
-                    } catch (InstantiationException e) {
-                        throw new WordGameException(e.getMessage(), e);
-                    } catch (IllegalAccessException e) {
-                        throw new WordGameException(e.getMessage(), e);
-                    } catch (InvocationTargetException e) {
+                    } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                         throw new WordGameException(e.getMessage(), e);
                     }
                     return ce;
@@ -550,11 +497,7 @@ public abstract class WordGameClient implements IWordGameClient {
                     Throwable t;
                     try {
                         t = stringConstructor.newInstance(details.getErrorMessage());
-                    } catch (InstantiationException e) {
-                        throw new WordGameException(e.getMessage(), e);
-                    } catch (IllegalAccessException e) {
-                        throw new WordGameException(e.getMessage(), e);
-                    } catch (InvocationTargetException e) {
+                    } catch (InstantiationException | InvocationTargetException | IllegalAccessException e) {
                         throw new WordGameException(e.getMessage(), e);
                     }
 

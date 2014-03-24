@@ -13,10 +13,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.HttpClientUtils;
-import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.BasicClientConnectionManager;
 import org.entitypedia.games.common.exceptions.ExceptionDetails;
 import org.entitypedia.games.common.exceptions.WordGameException;
 import org.slf4j.Logger;
@@ -49,7 +47,6 @@ public abstract class WordGameClient implements IWordGameClient {
 
     protected String apiEndpoint = "http://localhost:9080/<game>/webapi/";
 
-    protected ClientConnectionManager cm;
     protected HttpClient hc;
 
     protected final OAuthConsumer consumer;
@@ -61,8 +58,7 @@ public abstract class WordGameClient implements IWordGameClient {
         this.apiEndpoint = apiEndpoint;
         consumer = new CommonsHttpOAuthConsumer(uid, password);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        this.cm = new BasicClientConnectionManager();
-        this.hc = new DefaultHttpClient(cm);
+        this.hc = new DefaultHttpClient();
     }
 
     public WordGameClient(String apiEndpoint, String uid, String password, String token, String tokenSecret) {
@@ -70,8 +66,7 @@ public abstract class WordGameClient implements IWordGameClient {
         consumer = new CommonsHttpOAuthConsumer(uid, password);
         consumer.setTokenWithSecret(token, tokenSecret);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        this.cm = new BasicClientConnectionManager();
-        this.hc = new DefaultHttpClient(cm);
+        this.hc = new DefaultHttpClient();
     }
 
     @Override
@@ -106,7 +101,7 @@ public abstract class WordGameClient implements IWordGameClient {
         }
     }
 
-    protected String addPageSizeAndNo(String url, Integer pageSize, Integer pageNo) {
+    public static String addPageSizeAndNo(String url, Integer pageSize, Integer pageNo) {
         StringBuilder listUrl = new StringBuilder(url);
         if (null != pageSize) {
             if (-1 == listUrl.indexOf("?")) {
@@ -127,7 +122,7 @@ public abstract class WordGameClient implements IWordGameClient {
         return listUrl.toString();
     }
 
-    protected String addPageSizeAndNoAndFilter(String url, Integer pageSize, Integer pageNo, String filter) {
+    public static String addPageSizeAndNoAndFilter(String url, Integer pageSize, Integer pageNo, String filter) {
         StringBuilder listUrl = new StringBuilder(url);
         if (null != pageSize) {
             if (-1 == listUrl.indexOf("?")) {
@@ -156,7 +151,7 @@ public abstract class WordGameClient implements IWordGameClient {
         return listUrl.toString();
     }
 
-    protected String addPageSizeAndNoAndFilterAndOrder(String url, Integer pageSize, Integer pageNo, String filter, String order) {
+    public static String addPageSizeAndNoAndFilterAndOrder(String url, Integer pageSize, Integer pageNo, String filter, String order) {
         StringBuilder listUrl = new StringBuilder(url);
         if (null != pageSize) {
             if (-1 == listUrl.indexOf("?")) {
@@ -520,15 +515,6 @@ public abstract class WordGameClient implements IWordGameClient {
                 err.close();
             }
         }
-    }
-
-    public ClientConnectionManager getConnectionManager() {
-        return cm;
-    }
-
-    public void setConnectionManager(ClientConnectionManager cm) {
-        this.cm = cm;
-        this.hc = new DefaultHttpClient(cm);
     }
 
     public HttpClient getHttpClient() {

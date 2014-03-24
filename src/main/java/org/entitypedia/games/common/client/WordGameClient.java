@@ -29,6 +29,8 @@ public abstract class WordGameClient implements IWordGameClient {
     private static final Logger log = LoggerFactory.getLogger(WordGameClient.class);
 
     protected final static String CHARSET = "UTF-8";
+    protected static final TypeReference<Integer> INTEGER_TYPE_REFERENCE = new TypeReference<Integer>() {
+    };
     protected static final TypeReference<Long> LONG_TYPE_REFERENCE = new TypeReference<Long>() {
     };
     protected static final TypeReference<Date> DATE_TYPE_REFERENCE = new TypeReference<Date>() {

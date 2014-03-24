@@ -25,7 +25,7 @@ public interface IWordGameClient {
 
     /**
      * Sets connection signing flag. If true all API calls will be signed.
-     * @param signConnection
+     * @param signConnection connection signing flag
      */
     void setSignConnection(boolean signConnection);
 }

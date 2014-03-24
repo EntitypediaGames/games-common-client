@@ -543,14 +543,14 @@ public abstract class WordGameClient implements IWordGameClient {
                     }
                     return ce;
                 } else if (Throwable.class.isAssignableFrom(clazz)) {
-                    Constructor<? extends Throwable> stringConstructor = null;
+                    Constructor<? extends Throwable> stringConstructor;
                     try {
                         stringConstructor = clazz.getConstructor(String.class);
                     } catch (NoSuchMethodException e) {
                         return new WordGameException("Cannot find String constructor for exception: " + clazz.getName(), e);
                     }
 
-                    Throwable t = null;
+                    Throwable t;
                     try {
                         t = stringConstructor.newInstance(details.getErrorMessage());
                     } catch (InstantiationException e) {

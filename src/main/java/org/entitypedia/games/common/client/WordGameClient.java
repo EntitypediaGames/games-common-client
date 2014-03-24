@@ -4,10 +4,19 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import oauth.signpost.OAuthConsumer;
-import oauth.signpost.basic.DefaultOAuthConsumer;
+import oauth.signpost.commonshttp.CommonsHttpOAuthConsumer;
 import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.utils.HttpClientUtils;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.BasicClientConnectionManager;
 import org.entitypedia.games.common.exceptions.ExceptionDetails;
 import org.entitypedia.games.common.exceptions.WordGameException;
 import org.slf4j.Logger;
@@ -16,8 +25,6 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Date;
 
@@ -42,6 +49,9 @@ public abstract class WordGameClient implements IWordGameClient {
 
     protected String apiEndpoint = "http://localhost:9080/<game>/webapi/";
 
+    protected ClientConnectionManager cm;
+    protected HttpClient hc;
+
     protected final OAuthConsumer consumer;
     protected final ObjectMapper mapper = new ObjectMapper();
 
@@ -49,15 +59,19 @@ public abstract class WordGameClient implements IWordGameClient {
 
     public WordGameClient(String apiEndpoint, String uid, String password) {
         this.apiEndpoint = apiEndpoint;
-        consumer = new DefaultOAuthConsumer(uid, password);
+        consumer = new CommonsHttpOAuthConsumer(uid, password);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        this.cm = new BasicClientConnectionManager();
+        this.hc = new DefaultHttpClient(cm);
     }
 
     public WordGameClient(String apiEndpoint, String uid, String password, String token, String tokenSecret) {
         this.apiEndpoint = apiEndpoint;
-        consumer = new DefaultOAuthConsumer(uid, password);
+        consumer = new CommonsHttpOAuthConsumer(uid, password);
         consumer.setTokenWithSecret(token, tokenSecret);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        this.cm = new BasicClientConnectionManager();
+        this.hc = new DefaultHttpClient(cm);
     }
 
     @Override
@@ -182,21 +196,25 @@ public abstract class WordGameClient implements IWordGameClient {
     protected void doEmptyGet(String url) throws WordGameException {
         log.debug("GETting url: " + url);
         try {
-            URL u = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+            HttpGet request = new HttpGet(url);
             try {
-                connection.setRequestProperty("Accept-Charset", CHARSET);
-                if (signConnection) {
-                    consumer.sign(connection);
-                }
-                connection.connect();
+                request.addHeader("Accept-Charset", CHARSET);
 
-                log.debug("Response code: " + connection.getResponseCode());
-                if (200 != connection.getResponseCode()) {
-                    throw processError(connection);
+                if (signConnection) {
+                    consumer.sign(request);
+                }
+
+                HttpResponse response = hc.execute(request);
+                try {
+                    log.debug("Response code: " + response.getStatusLine().getStatusCode());
+                    if (200 != response.getStatusLine().getStatusCode()) {
+                        throw processError(response);
+                    }
+                } finally {
+                    HttpClientUtils.closeQuietly(response);
                 }
             } finally {
-                connection.disconnect();
+                request.releaseConnection();
             }
         } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
@@ -207,45 +225,46 @@ public abstract class WordGameClient implements IWordGameClient {
     protected <T> T doSimpleGet(String url, TypeReference<T> type) throws WordGameException {
         log.debug("GETting url: " + url);
         try {
-            URL u = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+            HttpGet request = new HttpGet(url);
             try {
-                connection.setRequestProperty("Accept-Charset", CHARSET);
-                if (signConnection) {
-                    consumer.sign(connection);
-                }
-                connection.connect();
+                request.addHeader("Accept-Charset", CHARSET);
 
-                log.debug("Response code: " + connection.getResponseCode());
-                if (200 == connection.getResponseCode()) {
+                if (signConnection) {
+                    consumer.sign(request);
+                }
+                HttpResponse response = hc.execute(request);
+
+                log.debug("Response code: " + response.getStatusLine().getStatusCode());
+                if (200 == response.getStatusLine().getStatusCode()) {
                     InputStream in = null;
                     try {
                         if (log.isDebugEnabled()) {
                             final int BUFFER_SIZE = 1024 * 1024; // 1M buffer
                             ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
-                            in = new BufferedInputStream(connection.getInputStream());
+                            in = new BufferedInputStream(response.getEntity().getContent());
                             int b;
                             while ((b = in.read()) != -1) {
                                 bos.write(b);
                             }
                             byte[] buffer = bos.toByteArray();
-                            String response = new String(buffer, "UTF-8");
-                            log.debug("Response:\n" + response + "\n");
+                            String content = new String(buffer, "UTF-8");
+                            log.debug("Response:\n" + content + "\n");
                             return mapper.readValue(buffer, type);
                         } else {
-                            in = new BufferedInputStream(connection.getInputStream());
+                            in = new BufferedInputStream(response.getEntity().getContent());
                             return mapper.readValue(in, type);
                         }
                     } finally {
                         if (null != in) {
                             in.close();
                         }
+                        HttpClientUtils.closeQuietly(response);
                     }
                 } else {
-                    throw processError(connection);
+                    throw processError(response);
                 }
             } finally {
-                connection.disconnect();
+                request.releaseConnection();
             }
         } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
@@ -255,22 +274,23 @@ public abstract class WordGameClient implements IWordGameClient {
     protected void doSimplePost(String url) throws WordGameException {
         log.debug("POSTing url: " + url);
         try {
-            URL u = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+            HttpPost request = new HttpPost(url);
             try {
-                connection.setRequestProperty("Accept-Charset", CHARSET);
-                connection.setRequestMethod("POST");
+                request.addHeader("Accept-Charset", CHARSET);
                 if (signConnection) {
-                    consumer.sign(connection);
+                    consumer.sign(request);
                 }
-                connection.connect();
-
-                log.debug("Response code: " + connection.getResponseCode());
-                if (200 != connection.getResponseCode()) {
-                    throw processError(connection);
+                HttpResponse response = hc.execute(request);
+                try {
+                    log.debug("Response code: " + response.getStatusLine().getStatusCode());
+                    if (200 != response.getStatusLine().getStatusCode()) {
+                        throw processError(response);
+                    }
+                } finally {
+                    HttpClientUtils.closeQuietly(response);
                 }
             } finally {
-                connection.disconnect();
+                request.releaseConnection();
             }
         } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
@@ -280,35 +300,28 @@ public abstract class WordGameClient implements IWordGameClient {
     protected void doPostObject(String url, Object object) throws WordGameException {
         log.debug("POSTing object: " + url);
         try {
-            URL u = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+            HttpPost request = new HttpPost(url);
             try {
-                connection.setRequestProperty("Accept-Charset", CHARSET);
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
-                connection.setChunkedStreamingMode(0);
+                request.addHeader("Accept-Charset", CHARSET);
+                request.addHeader("Content-Type", "application/json");
+
+                request.setEntity(new ByteArrayEntity(mapper.writeValueAsBytes(object)));
+
                 if (signConnection) {
-                    consumer.sign(connection);
+                    consumer.sign(request);
                 }
-                connection.connect();
 
-                OutputStream out = null;
+                HttpResponse response = hc.execute(request);
                 try {
-                    out = new BufferedOutputStream(connection.getOutputStream());
-                    mapper.writeValue(out, object);
-                } finally {
-                    if (null != out) {
-                        out.close();
+                    log.debug("Response code: " + response.getStatusLine().getStatusCode());
+                    if (200 != response.getStatusLine().getStatusCode()) {
+                        throw processError(response);
                     }
-                }
-
-                log.debug("Response code: " + connection.getResponseCode());
-                if (200 != connection.getResponseCode()) {
-                    throw processError(connection);
+                } finally {
+                    HttpClientUtils.closeQuietly(response);
                 }
             } finally {
-                connection.disconnect();
+                request.releaseConnection();
             }
         } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
@@ -318,59 +331,48 @@ public abstract class WordGameClient implements IWordGameClient {
     protected <T> T doPostReadObject(String url, Object object, TypeReference<T> type) throws WordGameException {
         log.debug("POSTing object: " + url);
         try {
-            URL u = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+            HttpPost request = new HttpPost(url);
             try {
-                connection.setRequestProperty("Accept-Charset", CHARSET);
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestMethod("POST");
-                connection.setDoOutput(true);
-                connection.setChunkedStreamingMode(0);
+                request.addHeader("Accept-Charset", CHARSET);
+                request.addHeader("Content-Type", "application/json");
+
+                request.setEntity(new ByteArrayEntity(mapper.writeValueAsBytes(object)));
+
                 if (signConnection) {
-                    consumer.sign(connection);
-                }
-                connection.connect();
-
-                OutputStream out = null;
-                try {
-                    out = new BufferedOutputStream(connection.getOutputStream());
-                    mapper.writeValue(out, object);
-                } finally {
-                    if (null != out) {
-                        out.close();
-                    }
+                    consumer.sign(request);
                 }
 
-                log.debug("Response code: " + connection.getResponseCode());
-                if (200 == connection.getResponseCode()) {
+                HttpResponse response = hc.execute(request);
+                if (200 == response.getStatusLine().getStatusCode()) {
                     InputStream in = null;
                     try {
                         if (log.isDebugEnabled()) {
                             final int BUFFER_SIZE = 1024 * 1024; // 1M buffer
                             ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
-                            in = new BufferedInputStream(connection.getInputStream());
+                            in = new BufferedInputStream(response.getEntity().getContent());
                             int b;
                             while ((b = in.read()) != -1) {
                                 bos.write(b);
                             }
                             byte[] buffer = bos.toByteArray();
-                            String response = new String(buffer, "UTF-8");
-                            log.debug("Response:\n" + response + "\n");
+                            String content = new String(buffer, "UTF-8");
+                            log.debug("Response:\n" + content + "\n");
                             return mapper.readValue(buffer, type);
                         } else {
-                            in = new BufferedInputStream(connection.getInputStream());
+                            in = new BufferedInputStream(response.getEntity().getContent());
                             return mapper.readValue(in, type);
                         }
                     } finally {
                         if (null != in) {
                             in.close();
                         }
+                        HttpClientUtils.closeQuietly(response);
                     }
                 } else {
-                    throw processError(connection);
+                    throw processError(response);
                 }
             } finally {
-                connection.disconnect();
+                request.releaseConnection();
             }
         } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
@@ -380,54 +382,53 @@ public abstract class WordGameClient implements IWordGameClient {
     protected <T> T doPostRead(String url, TypeReference<T> type) throws WordGameException {
         log.debug("POSTing url: " + url);
         try {
-            URL u = new URL(url);
-            HttpURLConnection connection = (HttpURLConnection) u.openConnection();
+            HttpPost request = new HttpPost(url);
             try {
-                connection.setRequestProperty("Accept-Charset", CHARSET);
-                connection.setRequestMethod("POST");
-                if (signConnection) {
-                    consumer.sign(connection);
-                }
-                connection.connect();
+                request.addHeader("Accept-Charset", CHARSET);
+                request.addHeader("Content-Type", "application/json");
 
-                log.debug("Response code: " + connection.getResponseCode());
-                if (200 == connection.getResponseCode()) {
+                if (signConnection) {
+                    consumer.sign(request);
+                }
+                HttpResponse response = hc.execute(request);
+                if (200 == response.getStatusLine().getStatusCode()) {
                     InputStream in = null;
                     try {
                         if (log.isDebugEnabled()) {
                             final int BUFFER_SIZE = 1024 * 1024; // 1M buffer
                             ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
-                            in = new BufferedInputStream(connection.getInputStream());
+                            in = new BufferedInputStream(response.getEntity().getContent());
                             int b;
                             while ((b = in.read()) != -1) {
                                 bos.write(b);
                             }
                             byte[] buffer = bos.toByteArray();
-                            String response = new String(buffer, "UTF-8");
-                            log.debug("Response:\n" + response + "\n");
+                            String content = new String(buffer, "UTF-8");
+                            log.debug("Response:\n" + content + "\n");
                             return mapper.readValue(buffer, type);
                         } else {
-                            in = new BufferedInputStream(connection.getInputStream());
+                            in = new BufferedInputStream(response.getEntity().getContent());
                             return mapper.readValue(in, type);
                         }
                     } finally {
                         if (null != in) {
                             in.close();
                         }
+                        HttpClientUtils.closeQuietly(response);
                     }
                 } else {
-                    throw processError(connection);
+                    throw processError(response);
                 }
             } finally {
-                connection.disconnect();
+                request.releaseConnection();
             }
         } catch (OAuthExpectationFailedException | OAuthCommunicationException | OAuthMessageSignerException | IOException e) {
             throw new WordGameException(e.getMessage(), e);
         }
     }
 
-    protected RuntimeException processError(HttpURLConnection connection) throws IOException {
-        return processError(connection.getErrorStream(), mapper);
+    protected RuntimeException processError(HttpResponse response) throws IOException {
+        return processError(response.getEntity().getContent(), mapper);
     }
 
     @SuppressWarnings("unchecked")
@@ -519,5 +520,22 @@ public abstract class WordGameClient implements IWordGameClient {
                 err.close();
             }
         }
+    }
+
+    public ClientConnectionManager getConnectionManager() {
+        return cm;
+    }
+
+    public void setConnectionManager(ClientConnectionManager cm) {
+        this.cm = cm;
+        this.hc = new DefaultHttpClient(cm);
+    }
+
+    public HttpClient getHttpClient() {
+        return hc;
+    }
+
+    public void setHttpClient(HttpClient hc) {
+        this.hc = hc;
     }
 }

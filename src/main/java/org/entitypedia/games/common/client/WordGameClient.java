@@ -191,8 +191,7 @@ public abstract class WordGameClient implements IWordGameClient {
                 connection.connect();
 
                 log.debug("Response code: " + connection.getResponseCode());
-                if (200 == connection.getResponseCode()) {
-                } else {
+                if (200 != connection.getResponseCode()) {
                     throw processError(connection);
                 }
             } finally {
@@ -282,8 +281,7 @@ public abstract class WordGameClient implements IWordGameClient {
                 connection.connect();
 
                 log.debug("Response code: " + connection.getResponseCode());
-                if (200 == connection.getResponseCode()) {
-                } else {
+                if (200 != connection.getResponseCode()) {
                     throw processError(connection);
                 }
             } finally {
@@ -329,8 +327,7 @@ public abstract class WordGameClient implements IWordGameClient {
                 }
 
                 log.debug("Response code: " + connection.getResponseCode());
-                if (200 == connection.getResponseCode()) {
-                } else {
+                if (200 != connection.getResponseCode()) {
                     throw processError(connection);
                 }
             } finally {

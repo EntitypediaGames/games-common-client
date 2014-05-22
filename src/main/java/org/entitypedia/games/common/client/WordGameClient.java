@@ -14,7 +14,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.entitypedia.games.common.exceptions.ExceptionDetails;
 import org.entitypedia.games.common.exceptions.WordGameException;
 import org.slf4j.Logger;
@@ -58,7 +58,7 @@ public abstract class WordGameClient implements IWordGameClient {
         this.apiEndpoint = apiEndpoint;
         consumer = new CommonsHttpOAuthConsumer(uid, password);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        this.hc = new DefaultHttpClient();
+        this.hc = HttpClients.createDefault();
     }
 
     public WordGameClient(String apiEndpoint, String uid, String password, String token, String tokenSecret) {
@@ -66,7 +66,7 @@ public abstract class WordGameClient implements IWordGameClient {
         consumer = new CommonsHttpOAuthConsumer(uid, password);
         consumer.setTokenWithSecret(token, tokenSecret);
         mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-        this.hc = new DefaultHttpClient();
+        this.hc = HttpClients.createDefault();
     }
 
     @Override

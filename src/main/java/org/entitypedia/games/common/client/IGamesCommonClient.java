@@ -1,9 +1,11 @@
 package org.entitypedia.games.common.client;
 
 /**
- * @author <a rel="author" href="http://autayeu.com/">Aliaksandr Autayeu</a>
+ * A common interface for all games clients.
+ *
+ * @author <a href="http://autayeu.com/">Aliaksandr Autayeu</a>
  */
-public interface IWordGameClient {
+public interface IGamesCommonClient {
 
     /**
      * Returns current api endpoint.

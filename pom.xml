@@ -67,18 +67,6 @@
         </dependency>
 
         <dependency>
-            <groupId>oauth.signpost</groupId>
-            <artifactId>signpost-core</artifactId>
-            <version>${signpost.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>oauth.signpost</groupId>
-            <artifactId>signpost-commonshttp4</artifactId>
-            <version>${signpost.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>${httpclient.version}</version>
@@ -88,6 +76,18 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
             <version>${httpclient.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>oauth.signpost</groupId>
+            <artifactId>signpost-core</artifactId>
+            <version>${signpost.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>oauth.signpost</groupId>
+            <artifactId>signpost-commonshttp4</artifactId>
+            <version>${signpost.version}</version>
         </dependency>
 
         <dependency>

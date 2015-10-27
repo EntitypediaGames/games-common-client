@@ -24,6 +24,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 
 /**
@@ -35,7 +36,11 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
 
     private static final Logger log = LoggerFactory.getLogger(GamesCommonClient.class);
 
-    protected final static String CHARSET = "UTF-8";
+    /**
+     * Buffer size in stream copying routines.
+     */
+    private static final int COPY_BUFFER_SIZE = 16384;
+
     protected static final TypeReference<Integer> INTEGER_TYPE_REFERENCE = new TypeReference<Integer>() {
     };
     protected static final TypeReference<Long> LONG_TYPE_REFERENCE = new TypeReference<Long>() {
@@ -105,15 +110,8 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
         InputStream err = null;
         try {
             if (log.isDebugEnabled()) {
-                final int BUFFER_SIZE = 1024 * 1024; // 1M buffer
-                ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
-                err = new BufferedInputStream(errorStream);
-                int b;
-                while ((b = err.read()) != -1) {
-                    bos.write(b);
-                }
-                byte[] buffer = bos.toByteArray();
-                String response = new String(buffer, "UTF-8");
+                byte[] buffer = inputStreamToByteArray(errorStream);
+                String response = new String(buffer, StandardCharsets.UTF_8);
                 log.debug("Response:\n" + response + "\n");
                 err = new ByteArrayInputStream(buffer);
             } else {
@@ -277,6 +275,28 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
         return listUrl.toString();
     }
 
+    /**
+     * Converts an InputStream instance into a byte[].
+     *
+     * @param is InputStream instance
+     * @return byte[]
+     * @throws IOException IOException
+     */
+    protected static byte[] inputStreamToByteArray(InputStream is) throws IOException {
+        ByteArrayOutputStream buffer = new ByteArrayOutputStream();
+
+        int nRead;
+        byte[] data = new byte[COPY_BUFFER_SIZE];
+
+        while ((nRead = is.read(data, 0, data.length)) != -1) {
+            buffer.write(data, 0, nRead);
+        }
+
+        buffer.flush();
+
+        return buffer.toByteArray();
+    }
+
     protected String encodeURL(String string) {
         if (null == string) {
             return null;
@@ -294,7 +314,7 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
         try {
             HttpGet request = new HttpGet(url);
             try {
-                request.addHeader("Accept-Charset", CHARSET);
+                request.addHeader("Accept-Charset", StandardCharsets.UTF_8.name());
 
                 if (signConnection) {
                     consumer.sign(request);
@@ -322,7 +342,7 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
         try {
             HttpGet request = new HttpGet(url);
             try {
-                request.addHeader("Accept-Charset", CHARSET);
+                request.addHeader("Accept-Charset", StandardCharsets.UTF_8.name());
 
                 if (signConnection) {
                     consumer.sign(request);
@@ -334,15 +354,9 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
                     InputStream in = null;
                     try {
                         if (log.isDebugEnabled()) {
-                            final int BUFFER_SIZE = 1024 * 1024; // 1M buffer
-                            ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
                             in = new BufferedInputStream(response.getEntity().getContent());
-                            int b;
-                            while ((b = in.read()) != -1) {
-                                bos.write(b);
-                            }
-                            byte[] buffer = bos.toByteArray();
-                            String content = new String(buffer, "UTF-8");
+                            byte[] buffer = inputStreamToByteArray(in);
+                            String content = new String(buffer, StandardCharsets.UTF_8);
                             log.debug("Response:\n" + content + "\n");
                             return mapper.readValue(buffer, type);
                         } else {
@@ -371,7 +385,7 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
         try {
             HttpPost request = new HttpPost(url);
             try {
-                request.addHeader("Accept-Charset", CHARSET);
+                request.addHeader("Accept-Charset", StandardCharsets.UTF_8.name());
                 if (signConnection) {
                     consumer.sign(request);
                 }
@@ -397,7 +411,7 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
         try {
             HttpPost request = new HttpPost(url);
             try {
-                request.addHeader("Accept-Charset", CHARSET);
+                request.addHeader("Accept-Charset", StandardCharsets.UTF_8.name());
                 request.addHeader("Content-Type", "application/json");
 
                 request.setEntity(new ByteArrayEntity(mapper.writeValueAsBytes(object)));
@@ -428,7 +442,7 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
         try {
             HttpPost request = new HttpPost(url);
             try {
-                request.addHeader("Accept-Charset", CHARSET);
+                request.addHeader("Accept-Charset", StandardCharsets.UTF_8.name());
                 request.addHeader("Content-Type", "application/json");
 
                 request.setEntity(new ByteArrayEntity(mapper.writeValueAsBytes(object)));
@@ -442,15 +456,9 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
                     InputStream in = null;
                     try {
                         if (log.isDebugEnabled()) {
-                            final int BUFFER_SIZE = 1024 * 1024; // 1M buffer
-                            ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
                             in = new BufferedInputStream(response.getEntity().getContent());
-                            int b;
-                            while ((b = in.read()) != -1) {
-                                bos.write(b);
-                            }
-                            byte[] buffer = bos.toByteArray();
-                            String content = new String(buffer, "UTF-8");
+                            byte[] buffer = inputStreamToByteArray(in);
+                            String content = new String(buffer, StandardCharsets.UTF_8);
                             log.debug("Response:\n" + content + "\n");
                             return mapper.readValue(buffer, type);
                         } else {
@@ -479,7 +487,7 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
         try {
             HttpPost request = new HttpPost(url);
             try {
-                request.addHeader("Accept-Charset", CHARSET);
+                request.addHeader("Accept-Charset", StandardCharsets.UTF_8.name());
                 request.addHeader("Content-Type", "application/json");
 
                 if (signConnection) {
@@ -490,15 +498,9 @@ public abstract class GamesCommonClient implements IGamesCommonClient {
                     InputStream in = null;
                     try {
                         if (log.isDebugEnabled()) {
-                            final int BUFFER_SIZE = 1024 * 1024; // 1M buffer
-                            ByteArrayOutputStream bos = new ByteArrayOutputStream(BUFFER_SIZE);
                             in = new BufferedInputStream(response.getEntity().getContent());
-                            int b;
-                            while ((b = in.read()) != -1) {
-                                bos.write(b);
-                            }
-                            byte[] buffer = bos.toByteArray();
-                            String content = new String(buffer, "UTF-8");
+                            byte[] buffer = inputStreamToByteArray(in);
+                            String content = new String(buffer, StandardCharsets.UTF_8);
                             log.debug("Response:\n" + content + "\n");
                             return mapper.readValue(buffer, type);
                         } else {

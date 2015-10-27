@@ -10,7 +10,7 @@
 
     <artifactId>entitypedia-games-common-client</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.14-SNAPSHOT</version>
+    <version>1.0.14</version>
 
     <name>Entitypedia Games Client</name>
     <description>Entitypedia Games Java Client</description>
@@ -27,7 +27,8 @@
         <connection>scm:git:https://github.com/EntitypediaGames/games-common-client.git</connection>
         <developerConnection>scm:git:git@github.com:EntitypediaGames/games-common-client.git</developerConnection>
         <url>https://github.com/EntitypediaGames/games-common-client</url>
-    </scm>
+      <tag>entitypedia-games-common-client-1.0.14</tag>
+  </scm>
 
     <issueManagement>
         <system>Github</system>
